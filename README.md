@@ -8,10 +8,11 @@ A Kubernetes pod diagnostic agent for homelabs, built with [kagent](https://kage
 
 PodLikar scans your k3s/Kubernetes cluster and tells you what's broken and why. It's designed for homelab environments where nodes restart often, hardware is modest, and things break in ways that production clusters don't usually see.
 
-Two modes:
+Three modes:
 
 - `health check` — full scan of nodes, pods, storage. Reports issues by severity.
 - `diagnose <pod>` — deep dive into a specific broken pod with root cause analysis.
+- `heal <pod>` — deletes a pod to force Kubernetes to recreate it (only for controller-managed pods).
 
 Example output after a reboot:
 
@@ -98,6 +99,8 @@ Clean up when done:
 kubectl delete namespace podlikar-test
 ```
 
+Scenarios `07-healable-dependency.yaml` and `08-database-fix.yaml` are for testing the heal mode — deploy the app first, then the database, then ask PodLikar to restart the app pod.
+
 ## Using a local LLM (Ollama)
 
 PodLikar supports local models via Ollama. Apply the config:
@@ -113,7 +116,7 @@ kubectl patch agent podlikar -n kagent --type merge \
   -p '{"spec":{"declarative":{"modelConfig":"ollama-model-config"}}}'
 ```
 
-Fair warning: I tested llama3.2 (3B), phi3, and qwen2 on CPU-only hardware and they all timed out trying to handle the MCP tool responses. Local LLMs can reason about k8s data fine — they just need GPU acceleration for interactive tool orchestration. See the [blog post](https://igorbond.info/podlikar) for the full writeup on this.
+Fair warning: I tested llama3.2 (3B), phi3, and qwen2 on CPU-only hardware and they all timed out trying to handle the MCP tool responses. Local LLMs can reason about k8s data fine — they just need GPU acceleration for interactive tool orchestration. See the [blog post](https://igorbond.info/posts/podlikar) for the full writeup on this.
 
 To switch back to Claude:
 
@@ -126,15 +129,16 @@ kubectl patch agent podlikar -n kagent --type merge \
 
 PodLikar is a declarative kagent agent — no custom code, just a YAML with a system prompt and a list of MCP tools. The prompt went through three iterations to get token usage down from 46K to 12K (details in the blog post).
 
-It uses 5 read-only MCP tools from kagent's built-in tool server:
+It uses 6 MCP tools from kagent's built-in tool server:
 
 - `k8s_get_resources` — list pods, nodes, PVCs
 - `k8s_describe_resource` — pod details + events
 - `k8s_get_pod_logs` — container logs
 - `k8s_get_events` — namespace events (used sparingly, it's expensive)
 - `k8s_get_resource_yaml` — full spec when needed
+- `k8s_delete_resource` — pod restart (heal mode only)
 
-Write tools are deliberately excluded. PodLikar diagnoses — it never modifies your cluster.
+The agent is read-only by default. Write operations (pod delete) only trigger when you explicitly ask it to heal or restart a pod. It also checks the pod is managed by a controller before deleting — standalone pods get a warning instead.
 
 ## Homelab failure patterns it knows about
 
@@ -159,7 +163,7 @@ Built and tested on:
 
 ## Blog post
 
-Full writeup covering the prompt engineering journey, token optimisation, and local LLM experiments: [igorbond.info/podlikar](https://igorbond.info/podlikar)
+Full writeup covering the prompt engineering journey, token optimisation, and local LLM experiments: [igorbond.info/posts/podlikar](https://igorbond.info/posts/podlikar)
 
 ## Built for
 
