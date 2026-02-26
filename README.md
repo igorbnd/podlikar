@@ -35,6 +35,8 @@ Recommended actions:
 2. Check database availability for app-waiting-for-db
 ```
 
+[![Watch the live demo video](https://img.youtube.com/vi/bjh2Cmaes9k/0.jpg)](https://www.youtube.com/watch?v=bjh2Cmaes9k)
+
 ## Requirements
 
 - A Kubernetes or k3s cluster
