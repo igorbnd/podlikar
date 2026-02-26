@@ -35,8 +35,7 @@ Recommended actions:
 2. Check database availability for app-waiting-for-db
 ```
 
-## Watch a short live demo video on YouTube (click on the picture)
-
+Watch a short live demo video on YouTube (click on the picture):
 [![Watch the live demo video](https://img.youtube.com/vi/bjh2Cmaes9k/0.jpg)](https://www.youtube.com/watch?v=bjh2Cmaes9k)
 
 ## Requirements
