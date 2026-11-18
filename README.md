@@ -165,7 +165,7 @@ Built and tested on:
 
 ## Blog post
 
-Full writeup covering the prompt engineering journey, token optimisation, and local LLM experiments: [igorbond.info/posts/podlikar](https://igorbond.info/posts/podlikar)
+Full writeup covering the prompt engineering journey, token optimisation, and local LLM experiments: [igorbond.com/posts/podlikar](https://igorbond.com/posts/podlikar)
 
 ## Built for
 
